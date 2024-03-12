@@ -1,9 +1,11 @@
-isort 
+isort
 black
 pre-commit
 
 pandas
+numpy
 loguru
 interpret
+seaborn
 
 openpyxl
