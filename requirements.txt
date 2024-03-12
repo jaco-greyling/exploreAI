@@ -1,0 +1,9 @@
+isort 
+black
+pre-commit
+
+pandas
+loguru
+interpret
+
+openpyxl
