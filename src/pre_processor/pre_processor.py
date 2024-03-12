@@ -9,17 +9,29 @@ from src import config
 
 
 class PreProcessor(BaseEstimator, TransformerMixin):
-    def __init__(self, production: bool = False):
-        self.data = None
+    def __init__(self, data: pd.DataFrame, production: bool = False):
+        self.data = data
+        self.production = production
 
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X, y=None):
-        return self
+    def transform(self, X: pd.DataFrame, y: pd.Series = None):
+        """transform the data by encoding categorical variables and imputing missing values.
 
-    def load_dataset(self, path="data/healthcare-dataset-stroke-data.csv"):
-        self.data = pd.read_csv(path)
+        Args:
+            X (pd.Data): features
+            y (pd.Series, optional): target. Defaults to None.
+        """
+        self.preprocess_data()
+        if self.production:
+            X_train, y_train = self.get_data_split()
+            X_train, y_train = self.oversample(X_train, y_train)
+            return X_train, y_train
+        else:
+            X_train, X_test, y_train, y_test = self.get_data_split()
+            X_train, y_train = self.oversample(X_train, y_train)
+        return X_train, X_test, y_train, y_test
 
     def preprocess_data(self) -> None:
         """
