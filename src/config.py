@@ -1,3 +1,9 @@
+import mlflow
+
+l_host = "127.0.0.1"
+l_port = "8080"
+mlflow.set_tracking_uri(uri=f"http://{l_host}:{l_port}")
+
 # Column names for the data
 ID_COLUMN = "id"
 GENDER_COLUMN = "gender"

@@ -1,5 +1,6 @@
 import mlflow
 from mlflow.models.signature import infer_signature
+from sklearn.metrics import accuracy_score
 
 
 class ModelTracker:
@@ -26,24 +27,38 @@ class ModelTracker:
         mlflow.set_experiment(self.experiment_name)
         mlflow.set_tag("Training Info", training_info)
 
-    def run_experiment(self, params: dict, accuracy: float, X_train, lr):
+    def run_experiment(self, params: dict, model, X_train, y_train, X_test, y_test):
         """
         Run the MLflow experiment.
 
         Args:
             params (dict): Hyperparameters for the model.
-            accuracy (float): Accuracy of the model.
-            X_train (numpy.ndarray): Training data.
-            lr (sklearn.linear_model._Base): Trained model.
+            model: Trained model.
+            X_train (numpy.ndarray): Training data features.
+            y_train (numpy.ndarray): Training data labels.
+            X_test (numpy.ndarray): Testing data features.
+            y_test (numpy.ndarray): Testing data labels.
         """
         with mlflow.start_run():
+            # Log model parameters
             mlflow.log_params(params)
-            mlflow.log_metric("accuracy", accuracy)
-            signature = infer_signature(X_train, lr.predict(X_train))
-            mlflow.log_model(
-                model=lr,  # 'lr' is your trained model, which can be of any type
+
+            # Evaluate the model
+            train_predictions = model.predict(X_train)
+            test_predictions = model.predict(X_test)
+
+            train_accuracy = accuracy_score(y_train, train_predictions)
+            test_accuracy = accuracy_score(y_test, test_predictions)
+
+            # Log accuracy metrics
+            mlflow.log_metric("train_accuracy", train_accuracy)
+            mlflow.log_metric("test_accuracy", test_accuracy)
+
+            # Log the model
+            signature = infer_signature(X_train, model.predict(X_train))
+            mlflow.pyfunc.log_model(
                 artifact_path=self.artifact_path,
+                python_model=model,
                 registered_model_name=self.registered_model_name,
                 signature=signature,
-                input_example=X_train[:1],
             )
