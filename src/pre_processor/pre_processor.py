@@ -9,8 +9,7 @@ from src import config
 
 
 class PreProcessor(BaseEstimator, TransformerMixin):
-    def __init__(self, data: pd.DataFrame, production: bool = False):
-        self.data = data
+    def __init__(self, production: bool = False):
         self.production = production
 
     def fit(self, X, y=None):
@@ -23,32 +22,35 @@ class PreProcessor(BaseEstimator, TransformerMixin):
             X (pd.Data): features
             y (pd.Series, optional): target. Defaults to None.
         """
-        self.preprocess_data()
+        X_processed = self.preprocess_data(X)
         if self.production:
-            X_train, y_train = self.get_data_split()
+            X_train, y_train = self.get_data_split(X_processed)
             X_train, y_train = self.oversample(X_train, y_train)
             return X_train, y_train
         else:
-            X_train, X_test, y_train, y_test = self.get_data_split()
+            X_train, X_test, y_train, y_test = self.get_data_split(X_processed)
             X_train, y_train = self.oversample(X_train, y_train)
         return X_train, X_test, y_train, y_test
 
-    def preprocess_data(self) -> None:
+    def preprocess_data(self, data: pd.DataFrame) -> None:
         """
         pre process data by encoding categorical variables and imputing missing values.
         """
-        encoded = pd.get_dummies(self.data[config.CATEGORICAL_COLUMNS], prefix=config.CATEGORICAL_COLUMNS)
+        encoded = pd.get_dummies(data[config.CATEGORICAL_COLUMNS], prefix=config.CATEGORICAL_COLUMNS)
 
         # Update data with new columns
-        self.data = pd.concat([encoded, self.data], axis=1)
-        self.data.drop(config.CATEGORICAL_COLUMNS, axis=1, inplace=True)
+        data = pd.concat([encoded, data], axis=1)
+        data.drop(config.CATEGORICAL_COLUMNS, axis=1, inplace=True)
 
         # Impute missing values of BMI & drop ID
-        self.data.bmi = self.data.bmi.fillna(0)
-        self.data.drop([config.ID_COLUMN], axis=1, inplace=True)
+        data.bmi = data.bmi.fillna(0)
+        data.drop([config.ID_COLUMN], axis=1, inplace=True)
+
+        return data
 
     def get_data_split(
         self,
+        data: pd.DataFrame,
     ) -> Union[Tuple[pd.DataFrame, pd.Series], Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.Series]]:
         """
         Splits the dataset into training and testing sets if not in production mode,
@@ -61,8 +63,8 @@ class PreProcessor(BaseEstimator, TransformerMixin):
               training target (y_train), and testing target (y_test) as DataFrames.
         """
 
-        X = self.data.iloc[:, :-1]
-        y = self.data.iloc[:, -1]
+        X = data.iloc[:, :-1]
+        y = data.iloc[:, -1]
         if self.production:
             return X, y
         else:
