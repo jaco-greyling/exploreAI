@@ -1,0 +1,13 @@
+isort
+black
+pre-commit
+
+pandas
+numpy
+loguru
+interpret
+seaborn
+imblearn
+mlflow
+
+openpyxl
