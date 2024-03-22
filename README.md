@@ -13,3 +13,5 @@ I typically make usee of the following patterns and tools:
 TODO's: 
 - Containerise solution
 - CI/CD pipelines
+- Examples using code
+- Docs 
