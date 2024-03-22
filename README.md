@@ -1,8 +1,9 @@
-# Undertanding how I solve ML problems :) 
+# Undertanding my skillset & how I solve ML problems :) 
 
 Please feel free to navigate through my codebase. I consider myself as Data Scientist with strong Software Engineering skills. 
 
 I typically make usee of the following patterns and tools: 
+- Version control skills
 - fit(), predict() pattern from sklearn.
 - OOP design principles
 - modular components to scale horizontally and vertically
