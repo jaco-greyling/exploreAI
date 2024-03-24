@@ -12,9 +12,26 @@ class EBM(BaseEstimator, ClassifierMixin, mlflow.pyfunc.PythonModel):
         self.ebm_model = ExplainableBoostingClassifier(random_state=self.random_state)
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> "EBM":
+        """EBM fit method.
+
+        Args:
+            X (pd.DataFrame): Features.
+            y (pd.Series): Target.
+
+        Returns:
+            EBM: EBM fitted model / class.
+        """
         self.ebm_model.fit(X, y)
         return self
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
+        """_summary_
+
+        Args:
+            X (pd.DataFrame): Features.
+
+        Returns:
+            np.ndarray: Model predictions.
+        """
         model_predictions = self.ebm_model.predict(X)
         return model_predictions
