@@ -25,7 +25,7 @@ class EBM(BaseEstimator, ClassifierMixin, mlflow.pyfunc.PythonModel):
         return self
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
-        """_summary_
+        """Predict method.
 
         Args:
             X (pd.DataFrame): Features.
